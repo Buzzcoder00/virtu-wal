@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'ui/dashboard.dart';
 import 'ui/login_screen.dart';
@@ -43,25 +42,55 @@ void main() async {
 class VirtuWalApp extends ConsumerWidget {
   const VirtuWalApp({super.key});
 
+  ThemeData _buildLightTheme(BuildContext context) {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF6A3CE8),
+        primary: const Color(0xFF6A3CE8),
+        secondary: const Color(0xFF3861FB),
+      ),
+      useMaterial3: true,
+      textTheme:
+          GoogleFonts.interTextTheme(Theme.of(context).textTheme).copyWith(
+        titleLarge: GoogleFonts.outfit(fontWeight: FontWeight.w700),
+        titleMedium: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+      ),
+      scaffoldBackgroundColor: const Color(0xFFF9FAFC),
+    );
+  }
+
+  ThemeData _buildDarkTheme(BuildContext context) {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF6A3CE8),
+        primary: const Color(0xFF6A3CE8),
+        secondary: const Color(0xFF3861FB),
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      textTheme:
+          GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
+        titleLarge: GoogleFonts.outfit(fontWeight: FontWeight.w700),
+        titleMedium: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      cardColor: const Color(0xFF1F1F1F),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1F1F1F),
+        foregroundColor: Colors.white,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'VirtuWal',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6A3CE8),
-          primary: const Color(0xFF6A3CE8),
-          secondary: const Color(0xFF3861FB),
-        ),
-        useMaterial3: true,
-        textTheme:
-            GoogleFonts.interTextTheme(Theme.of(context).textTheme).copyWith(
-          titleLarge: GoogleFonts.outfit(fontWeight: FontWeight.w700),
-          titleMedium: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF9FAFC),
-      ),
+      theme: _buildLightTheme(context),
+      darkTheme: _buildDarkTheme(context),
+      themeMode: ThemeMode.system,
       home: const _RootNavigator(),
       routes: {
         '/login': (_) => const LoginScreen(),

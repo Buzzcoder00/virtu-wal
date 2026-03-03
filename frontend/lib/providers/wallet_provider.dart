@@ -17,13 +17,25 @@ final firebaseServiceProvider = Provider<FirebaseService?>((ref) {
 final walletsProvider =
     StateNotifierProvider<WalletsNotifier, List<Wallet>>((ref) {
   final fsService = ref.watch(firebaseServiceProvider);
-  return WalletsNotifier(fsService);
+  final notifier = WalletsNotifier(fsService, ref);
+  // When service changes (login/logout), trigger refetch or clear
+  ref.listen(firebaseServiceProvider, (prev, next) {
+    if (next != null && prev != next) {
+      debugPrint('[walletsProvider] Service changed, refetching...');
+      notifier._fetchWallets();
+    } else if (next == null) {
+      debugPrint('[walletsProvider] User logged out, clearing wallets');
+      notifier.clearWallets();
+    }
+  });
+  return notifier;
 });
 
 class WalletsNotifier extends StateNotifier<List<Wallet>> {
   final FirebaseService? firebaseService;
+  final Ref ref;
 
-  WalletsNotifier(this.firebaseService) : super([]) {
+  WalletsNotifier(this.firebaseService, this.ref) : super([]) {
     // whenever the service becomes available (user logs in) fetch wallets
     if (firebaseService != null) {
       debugPrint('[WalletsNotifier] Service available, fetching wallets...');
@@ -31,6 +43,11 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     } else {
       debugPrint('[WalletsNotifier] No service (user not logged in)');
     }
+  }
+
+  void clearWallets() {
+    debugPrint('[WalletsNotifier] Clearing wallets on logout');
+    state = [];
   }
 
   Future<void> _fetchWallets() async {
@@ -46,8 +63,19 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   }
 
   Future<void> addWallet(Wallet wallet) async {
-    state = [wallet, ...state];
-    await firebaseService?.saveWallet(wallet);
+    // Only add after successful save to prevent duplicates
+    try {
+      debugPrint('[WalletsNotifier.addWallet] Saving wallet ${wallet.id}...');
+      await firebaseService?.saveWallet(wallet);
+      // Add to state only after successful save
+      if (!state.any((w) => w.id == wallet.id)) {
+        state = [wallet, ...state];
+        debugPrint('[WalletsNotifier.addWallet] Wallet added successfully');
+      }
+    } catch (e) {
+      debugPrint('[WalletsNotifier.addWallet] Error saving wallet: $e');
+      rethrow;
+    }
   }
 
   Future<void> removeWallet(String walletId) async {

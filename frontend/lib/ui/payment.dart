@@ -105,7 +105,22 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       final walletId = widget.payload['walletId'];
       final url = Uri.parse(
           'https://virtuwal-8ba9b-default-rtdb.asia-southeast1.firebasedatabase.app/wallets/$globalUuid/$walletId.json');
-      await http.patch(url, body: json.encode({'balance': newBalance}));
+      debugPrint(
+          '[PaymentScreen] Processing payment: \$${addAmount.toStringAsFixed(2)} to wallet $walletId');
+      debugPrint(
+          '[PaymentScreen] New balance will be: \$${newBalance.toStringAsFixed(2)}');
+      debugPrint('[PaymentScreen] PATCH request to: $url');
+
+      final response =
+          await http.patch(url, body: json.encode({'balance': newBalance}));
+
+      debugPrint(
+          '[PaymentScreen] PATCH response status: ${response.statusCode}');
+      debugPrint('[PaymentScreen] PATCH response body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        throw Exception('Server returned status ${response.statusCode}');
+      }
 
       // if the scanned wallet belongs to this device, update local state as well
       ref.read(walletsProvider.notifier).addBalance(walletId, addAmount);
@@ -130,11 +145,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         );
       }
     } catch (e) {
+      debugPrint('[PaymentScreen] Payment error: $e');
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+      }
     }
   }
 

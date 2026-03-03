@@ -16,6 +16,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   String? _error;
 
+  String _getErrorMessage(dynamic e) {
+    final msg = e.toString();
+    // Extract readable message from Firebase exceptions
+    if (msg.contains('user-not-found'))
+      return 'No account found with this email';
+    if (msg.contains('wrong-password')) return 'Incorrect password';
+    if (msg.contains('invalid-email')) return 'Invalid email address';
+    if (msg.contains('user-disabled')) return 'This account has been disabled';
+    if (msg.contains('too-many-requests'))
+      return 'Too many login attempts. Please try again later';
+    // Return just the message part (after ]: )
+    if (msg.contains(']:')) return msg.split(']:').last.trim();
+    return msg;
+  }
+
   void _login() async {
     setState(() {
       _isLoading = true;
@@ -26,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await auth.signIn(_emailController.text.trim(), _passwordController.text);
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        _error = _getErrorMessage(e);
       });
     } finally {
       setState(() {

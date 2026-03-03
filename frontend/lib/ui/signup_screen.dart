@@ -16,6 +16,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   bool _isLoading = false;
   String? _error;
 
+  String _getErrorMessage(dynamic e) {
+    final msg = e.toString();
+    // Extract readable message from Firebase exceptions
+    if (msg.contains('email-already-in-use'))
+      return 'This email is already registered';
+    if (msg.contains('weak-password'))
+      return 'Password is too weak (at least 6 characters)';
+    if (msg.contains('invalid-email')) return 'Invalid email address';
+    if (msg.contains('too-many-requests'))
+      return 'Too many requests. Please try again later';
+    // Return just the message part (after ]: )
+    if (msg.contains(']:')) return msg.split(']:').last.trim();
+    return msg;
+  }
+
   void _signup() async {
     setState(() {
       _isLoading = true;
@@ -25,10 +40,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       final auth = ref.read(authServiceProvider);
       await auth.signUp(_emailController.text.trim(), _passwordController.text);
       // after signup, navigate back to login
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created! Please log in.')),
+        );
+      }
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        _error = _getErrorMessage(e);
       });
     } finally {
       setState(() {
