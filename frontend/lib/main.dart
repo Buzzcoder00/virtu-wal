@@ -38,7 +38,7 @@ class VirtuWalApp extends StatelessWidget {
                     primary: Color(0xFFFACC15),
                     secondary: Color(0xFF38BDF8),
                     surface: Color(0xFF0B0B0F),
-                    onSurface: Colors.white,
+                    onSurface: Color(0xFFFFFFFF),
                   )
                 : const ColorScheme.light(
                     primary: Color(0xFF6366F1), // Professional Indigo
@@ -54,7 +54,9 @@ class VirtuWalApp extends StatelessWidget {
               elevation: 0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24)),
-              color: state.isDarkMode ? const Color(0xFF111827) : Colors.white,
+              color: state.isDarkMode
+                  ? const Color(0xFF111827)
+                  : const Color(0xFFFFFFFF),
             ),
           );
 
@@ -111,12 +113,13 @@ class VirtuWalShell extends StatelessWidget {
   }
 
   Widget _buildCurrentScreen(AppState state) {
-    final activeWallet = state.selectedWalletId == null
-        ? null
-        : state.tempWallets.firstWhere(
-            (wallet) => wallet.id == state.selectedWalletId,
-            orElse: () => state.tempWallets.first,
-          );
+    final activeWallet =
+        state.selectedWalletId == null || state.tempWallets.isEmpty
+            ? null
+            : state.tempWallets.firstWhere(
+                (wallet) => wallet.id == state.selectedWalletId,
+                orElse: () => state.tempWallets.first,
+              );
 
     switch (state.currentView) {
       case 'dashboard':
