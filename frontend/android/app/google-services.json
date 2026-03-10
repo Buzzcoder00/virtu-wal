@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "238385591985",
+    "firebase_url": "https://virtuwal-8ba9b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "virtuwal-8ba9b",
+    "storage_bucket": "virtuwal-8ba9b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238385591985:android:ba3e9107fdb955d52a5490",
+        "android_client_info": {
+          "package_name": "com.virtuwal.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsZWnGadgO0da1CZd8-TdBg8BezL-YGXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

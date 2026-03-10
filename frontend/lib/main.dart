@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'app_state.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/generate_qr_screen.dart';
@@ -50,7 +51,7 @@ class VirtuWalApp extends StatelessWidget {
                 ? const Color(0xFF050506)
                 : const Color(0xFFF1F5F9),
             fontFamily: 'SF Pro',
-            cardTheme: CardThemeData(
+            cardTheme: CardTheme(
               elevation: 0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24)),
